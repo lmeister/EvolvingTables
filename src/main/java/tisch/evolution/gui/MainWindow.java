@@ -134,8 +134,6 @@ public class MainWindow extends JFrame {
         SpinnerNumberModel maxGenerations = new SpinnerNumberModel(5, 1, 500, 1);
         this.maximumGenerationsSpinner = new JSpinner();
         this.maximumGenerationsSpinner.setModel(maxGenerations);
-
-        this.visualizeButton.
     }
 
     public void setOutputTextArea(String text) {
