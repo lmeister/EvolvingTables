@@ -3,7 +3,13 @@ package tisch.evolution.gui;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.statistics.HistogramDataset;
+import org.jfree.data.statistics.Regression;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 import tisch.evolution.Configuration;
 import tisch.evolution.Optimizer;
 import tisch.evolution.crossover.AbstractCrossOverer;
@@ -92,24 +98,55 @@ public class MainWindow extends JFrame {
 
 
             visualizeButton.addActionListener(getVisualizeListener(result, evaluator));
+            visualizeButton.setEnabled(true);
         };
     }
 
     private ActionListener getVisualizeListener(List<Table> tables, AbstractEvaluator evaluator) {
         return actionEvent -> {
+            XYSeries tableSeries = new XYSeries("Table Fitness");
+
+            for (int i = 0; i < tables.size(); i++) {
+                tableSeries.add(i + 1, evaluator.evaluateFitness(tables.get(i)));
+            }
+            XYSeriesCollection dataset = new XYSeriesCollection(tableSeries);
+
+            // For the trend line
+            double[] coefficients = Regression.getOLSRegression(dataset, 0);
+            double b = coefficients[0];
+            double m = coefficients[1];
+
+            XYSeries trendLine = new XYSeries("Trend");
+            double x = tableSeries.getDataItem(0).getXValue();
+            trendLine.add(x, (m * x) + b); // add first point
+            x = tableSeries.getDataItem(tableSeries.getItemCount() - 1).getXValue();
+            trendLine.add(x, (m * x) + b); // add last point
+            dataset.addSeries(trendLine);
 
 
             // Create dataset, and plot
-            JFreeChart histogram = ChartFactory.createHistogram("Normal distribution",
-                    "y values", "x values", dataset);
+            JFreeChart scatterChart = ChartFactory.createScatterPlot(
+                    "Fittest per Generation", // Chart title
+                    "Generation", // X-Axis Label
+                    "Fitness", // Y-Axis Label
+                    dataset, // Dataset for the Chart
+                    PlotOrientation.VERTICAL,
+                    true,
+                    false,
+                    false
+            );
 
-            ChartPanel chartPanel = new ChartPanel(histogram);
+            XYPlot plot = scatterChart.getXYPlot();
+            XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
+            renderer.setSeriesLinesVisible(1, Boolean.TRUE);
+            renderer.setSeriesShapesVisible(1, Boolean.FALSE);
+
+
+            ChartPanel chartPanel = new ChartPanel(scatterChart);
             JFrame chatFrame = new JFrame();
             chatFrame.setSize(500, 500);
-            chatFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             chatFrame.getContentPane().add(chartPanel);
             chatFrame.setVisible(true);
-
         };
     }
 
@@ -134,6 +171,9 @@ public class MainWindow extends JFrame {
         SpinnerNumberModel maxGenerations = new SpinnerNumberModel(5, 1, 500, 1);
         this.maximumGenerationsSpinner = new JSpinner();
         this.maximumGenerationsSpinner.setModel(maxGenerations);
+
+        this.visualizeButton = new JButton();
+        this.visualizeButton.setEnabled(false);
     }
 
     public void setOutputTextArea(String text) {
