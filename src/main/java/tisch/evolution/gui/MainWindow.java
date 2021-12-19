@@ -42,6 +42,10 @@ public class MainWindow extends JFrame {
     private JLabel lengthDeviationLabel;
     private JLabel outputLabel;
 
+    // These should probably not be here
+    private List<Table> tables;
+    private AbstractEvaluator evaluator;
+
     public MainWindow(String title) {
         super(title);
 
@@ -51,6 +55,7 @@ public class MainWindow extends JFrame {
 
         // This will run the optimizer
         runButton.addActionListener(getRunListener());
+        visualizeButton.addActionListener(getVisualizeListener());
     }
 
     private ActionListener getRunListener() {
@@ -87,7 +92,9 @@ public class MainWindow extends JFrame {
             List<Table> result = optimizer.optimize();
             for (int i = 0; i < result.size(); i++) {
                 double currentFitness = evaluator.evaluateFitness(result.get(i));
-                this.appendOutputText("Fittest Table of Generation " + (i + 1) + ":\n   " + result.get(i) + "\n   Fitness: " + currentFitness + "\n--------------------------------------\n");
+                this.appendOutputText("Fittest Table of Generation " + (i + 1) + ":\n   "
+                        + result.get(i) + "\n   Fitness: " + currentFitness
+                        + "\n--------------------------------------\n");
             }
             Table lastTable = result.get(result.size() - 1);
             if (evaluator.evaluateFitness(lastTable) == fitnessGoal) {
@@ -96,13 +103,16 @@ public class MainWindow extends JFrame {
                 this.appendOutputText("No perfect table found. :-(");
             }
 
+            this.tables = result;
+            this.evaluator = evaluator;
 
-            visualizeButton.addActionListener(getVisualizeListener(result, evaluator));
-            visualizeButton.setEnabled(true);
+            if (!visualizeButton.isEnabled()) {
+                visualizeButton.setEnabled(true);
+            }
         };
     }
 
-    private ActionListener getVisualizeListener(List<Table> tables, AbstractEvaluator evaluator) {
+    private ActionListener getVisualizeListener() {
         return actionEvent -> {
             XYSeries tableSeries = new XYSeries("Table Fitness");
 
@@ -144,6 +154,7 @@ public class MainWindow extends JFrame {
 
             ChartPanel chartPanel = new ChartPanel(scatterChart);
             JFrame chatFrame = new JFrame();
+            chatFrame.setTitle("Plot");
             chatFrame.setSize(500, 500);
             chatFrame.getContentPane().add(chartPanel);
             chatFrame.setVisible(true);
