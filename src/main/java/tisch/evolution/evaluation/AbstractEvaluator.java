@@ -2,6 +2,10 @@ package tisch.evolution.evaluation;
 
 import tisch.evolution.population.Table;
 
+/**
+ * AbstractEvaluator defines Interfaces for Evaluator classes.
+ * Evaluator classes implement certain behavior to judge fitness of individuals.
+ */
 public abstract class AbstractEvaluator {
 
     /**

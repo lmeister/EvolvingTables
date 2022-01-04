@@ -13,7 +13,7 @@ import tisch.evolution.Configuration;
 import tisch.evolution.Optimizer;
 import tisch.evolution.crossover.AbstractCrossOverer;
 import tisch.evolution.crossover.LegCombinationCrossOverer;
-import tisch.evolution.crossover.OnePointCrossoverer;
+import tisch.evolution.crossover.OnePointCrossOverer;
 import tisch.evolution.evaluation.AbstractEvaluator;
 import tisch.evolution.evaluation.WobblynessEvaluator;
 import tisch.evolution.mutation.AbstractMutator;
@@ -47,6 +47,10 @@ public class MainWindow extends JFrame {
     private List<Table> tables;
     private AbstractEvaluator evaluator;
 
+    /**
+     * Constructor for main window. This is (bad) GUI-Stuff.
+     * @param title
+     */
     public MainWindow(String title) {
         super(title);
 
@@ -59,6 +63,10 @@ public class MainWindow extends JFrame {
         visualizeButton.addActionListener(getVisualizeListener());
     }
 
+    /**
+     * Generates the listener for the run button.
+     * @return
+     */
     private ActionListener getRunListener() {
         return actionEvent -> {
             // Get config
@@ -85,10 +93,15 @@ public class MainWindow extends JFrame {
 
 
             Configuration configuration = new Configuration(generationSize, maxGenerations, fitnessGoal, lengthDeviation, mutationRate, tournamentSize);
+
+            // CREATE MUTATOR OF CHOCIE
             AbstractMutator mutator = new LegMutator(configuration.getMAX_LENGTH_FACTOR());
             //AbstractMutator mutator = new AverageMutator();
+
+            // CREATE CROSSOVERER OF CHOICE
             AbstractCrossOverer crossOverer = new LegCombinationCrossOverer(configuration.getMUTATION_RATE(), mutator);
-            //AbstractCrossOverer crossOverer = new OnePointCrossoverer(configuration.getMUTATION_RATE(), mutator);
+            //AbstractCrossOverer crossOverer = new OnePointCrossOverer(configuration.getMUTATION_RATE(), mutator);
+
             AbstractEvaluator evaluator = new WobblynessEvaluator();
             Optimizer optimizer = new Optimizer(evaluator, crossOverer, configuration);
 
@@ -115,6 +128,10 @@ public class MainWindow extends JFrame {
         };
     }
 
+    /**
+     * Creates the listener for the visualize button
+     * @return
+     */
     private ActionListener getVisualizeListener() {
         return actionEvent -> {
             XYSeries tableSeries = new XYSeries("Table Fitness");
@@ -164,6 +181,9 @@ public class MainWindow extends JFrame {
         };
     }
 
+    /**
+     * Creates custom UI Components
+     */
     private void createUIComponents() {
         // TODO: place custom component creation code here
         SpinnerNumberModel lengthDeviation = new SpinnerNumberModel(0.15, 0.0, 1.00, 0.01);

@@ -10,11 +10,17 @@ public class LegMutator extends AbstractMutator {
         MAX_LENGTH_FACTOR = maxLength;
     }
 
+    /**
+     * Mutates a random leg by either cutting/adding some random length within deviation bounds.
+     * @param table table to be mutated
+     * @return Mutated table
+     */
     @Override
     public Table mutate(Table table) {
         Table copy = new Table(table);
         int leg = this.rnd.nextInt(4);
 
+        // Todo refactor
         if (leg == 0) {
             int length = this.rnd.nextInt((int) (MAX_LENGTH_FACTOR * copy.getLeg1()));
             // if smaller than .5 shorten leg

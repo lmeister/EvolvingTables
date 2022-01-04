@@ -1,5 +1,8 @@
 package tisch.evolution;
 
+/**
+ * Configuration object holds configuration for the optimizer class.
+ */
 public class Configuration {
     private final double MAX_LENGTH_FACTOR;
     private final int generationSize;

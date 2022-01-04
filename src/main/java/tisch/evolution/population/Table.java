@@ -1,13 +1,24 @@
 package tisch.evolution.population;
 
+import java.util.List;
 import java.util.Objects;
 
+/**
+ * Simple object representing a table.
+ */
 public class Table {
     private int leg1;
     private int leg2;
     private int leg3;
     private int leg4;
 
+    /**
+     * Standard constructor for table object.
+     * @param leg1 leg length for leg 1
+     * @param leg2 leg length for leg 2
+     * @param leg3 leg length for leg 3
+     * @param leg4 leg length for leg 4
+     */
     public Table(int leg1, int leg2, int leg3, int leg4) {
         this.leg1 = leg1;
         this.leg2 = leg2;
@@ -58,10 +69,17 @@ public class Table {
         this.leg4 = Math.max(length, 1);
     }
 
-    public int[] getLegsAsArray() {
-        return new int[]{this.leg1, this.leg2, this.leg3, this.leg4};
+    public List<Integer> getLegList() {
+        return List.of(this.leg1, this.leg2, this.leg3, this.leg4);
     }
 
+    // TODO Remove single leg getters/setters or dont expose to public
+
+    /**
+     * Get length of specified leg
+     * @param number Number of leg
+     * @return Length of given leg
+     */
     public int getLegFromNumber(int number) {
         switch (number) {
             case 1:
@@ -81,7 +99,13 @@ public class Table {
         }
     }
 
+    /**
+     * Set length of specified leg. Will use 1 if length < 1
+     * @param number Number of leg
+     * @param length Target length
+     */
     public void setLegFromNumber(int number, int length) {
+        length = Math.max(length, 1);
         switch (number) {
             case 1:
                 this.leg1 = length;
