@@ -13,11 +13,10 @@ import tisch.evolution.Configuration;
 import tisch.evolution.Optimizer;
 import tisch.evolution.crossover.AbstractCrossOverer;
 import tisch.evolution.crossover.LegCombinationCrossOverer;
-import tisch.evolution.crossover.OnePointCrossOverer;
 import tisch.evolution.evaluation.AbstractEvaluator;
-import tisch.evolution.evaluation.WobblynessEvaluator;
+import tisch.evolution.evaluation.SimpleWobblynessEvaluator;
+import tisch.evolution.evaluation.WeightedWobblynessEvaluator;
 import tisch.evolution.mutation.AbstractMutator;
-import tisch.evolution.mutation.AverageMutator;
 import tisch.evolution.mutation.LegMutator;
 import tisch.evolution.population.Table;
 
@@ -102,7 +101,8 @@ public class MainWindow extends JFrame {
             AbstractCrossOverer crossOverer = new LegCombinationCrossOverer(configuration.getMUTATION_RATE(), mutator);
             //AbstractCrossOverer crossOverer = new OnePointCrossOverer(configuration.getMUTATION_RATE(), mutator);
 
-            AbstractEvaluator evaluator = new WobblynessEvaluator();
+            //AbstractEvaluator evaluator = new SimpleWobblynessEvaluator();
+            AbstractEvaluator evaluator = new WeightedWobblynessEvaluator();
             Optimizer optimizer = new Optimizer(evaluator, crossOverer, configuration);
 
             List<Table> result = optimizer.optimize();
@@ -194,7 +194,7 @@ public class MainWindow extends JFrame {
         this.mutationRateSpinner = new JSpinner();
         this.mutationRateSpinner.setModel(mutationRate);
 
-        SpinnerNumberModel tournamentSize = new SpinnerNumberModel(10, 2, 10000, 1);
+        SpinnerNumberModel tournamentSize = new SpinnerNumberModel(5, 2, 500, 1);
         this.tournamentSizeSpinner = new JSpinner();
         this.tournamentSizeSpinner.setModel(tournamentSize);
 

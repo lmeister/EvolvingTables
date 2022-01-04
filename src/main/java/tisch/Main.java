@@ -1,21 +1,6 @@
 package tisch;
 
-import tisch.evolution.Configuration;
-import tisch.evolution.Optimizer;
-import tisch.evolution.crossover.AbstractCrossOverer;
-import tisch.evolution.crossover.LegCombinationCrossOverer;
-import tisch.evolution.evaluation.AbstractEvaluator;
-import tisch.evolution.evaluation.WobblynessEvaluator;
 import tisch.evolution.gui.MainWindow;
-import tisch.evolution.mutation.AbstractMutator;
-import tisch.evolution.mutation.LegMutator;
-import tisch.evolution.population.Table;
-
-import javax.swing.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
 
 public class Main {
 
