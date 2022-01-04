@@ -6,7 +6,6 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.Regression;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -14,9 +13,11 @@ import tisch.evolution.Configuration;
 import tisch.evolution.Optimizer;
 import tisch.evolution.crossover.AbstractCrossOverer;
 import tisch.evolution.crossover.LegCombinationCrossOverer;
+import tisch.evolution.crossover.OnePointCrossoverer;
 import tisch.evolution.evaluation.AbstractEvaluator;
 import tisch.evolution.evaluation.WobblynessEvaluator;
 import tisch.evolution.mutation.AbstractMutator;
+import tisch.evolution.mutation.AverageMutator;
 import tisch.evolution.mutation.LegMutator;
 import tisch.evolution.population.Table;
 
@@ -85,7 +86,9 @@ public class MainWindow extends JFrame {
 
             Configuration configuration = new Configuration(generationSize, maxGenerations, fitnessGoal, lengthDeviation, mutationRate, tournamentSize);
             AbstractMutator mutator = new LegMutator(configuration.getMAX_LENGTH_FACTOR());
+            //AbstractMutator mutator = new AverageMutator();
             AbstractCrossOverer crossOverer = new LegCombinationCrossOverer(configuration.getMUTATION_RATE(), mutator);
+            //AbstractCrossOverer crossOverer = new OnePointCrossoverer(configuration.getMUTATION_RATE(), mutator);
             AbstractEvaluator evaluator = new WobblynessEvaluator();
             Optimizer optimizer = new Optimizer(evaluator, crossOverer, configuration);
 

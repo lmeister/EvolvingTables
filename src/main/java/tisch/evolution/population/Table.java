@@ -62,6 +62,48 @@ public class Table {
         return new int[]{this.leg1, this.leg2, this.leg3, this.leg4};
     }
 
+    public int getLegFromNumber(int number) {
+        switch (number) {
+            case 1:
+                return this.getLeg1();
+
+            case 2:
+                return this.getLeg2();
+
+            case 3:
+                return this.getLeg3();
+
+            case 4:
+                return this.getLeg4();
+
+            default:
+                return -1;
+        }
+    }
+
+    public void setLegFromNumber(int number, int length) {
+        switch (number) {
+            case 1:
+                this.leg1 = length;
+                break;
+
+            case 2:
+                this.leg2 = length;
+                break;
+
+            case 3:
+                this.leg3 = length;
+                break;
+
+            case 4:
+                this.leg4 = length;
+                break;
+
+            default:
+                break;
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
