@@ -17,6 +17,7 @@ import tisch.evolution.evaluation.AbstractEvaluator;
 import tisch.evolution.evaluation.SimpleWobblynessEvaluator;
 import tisch.evolution.evaluation.WeightedWobblynessEvaluator;
 import tisch.evolution.mutation.AbstractMutator;
+import tisch.evolution.mutation.HeuristicMutator;
 import tisch.evolution.mutation.LegMutator;
 import tisch.evolution.population.Table;
 
@@ -95,7 +96,9 @@ public class MainWindow extends JFrame {
 
             // CREATE MUTATOR OF CHOCIE
             AbstractMutator mutator = new LegMutator(configuration.getMAX_LENGTH_FACTOR());
+            // Average and HeuristicMutator often end up in local max/wont terminate because no diversity
             //AbstractMutator mutator = new AverageMutator();
+            //AbstractMutator mutator = new HeuristicMutator();
 
             // CREATE CROSSOVERER OF CHOICE
             AbstractCrossOverer crossOverer = new LegCombinationCrossOverer(configuration.getMUTATION_RATE(), mutator);
@@ -194,11 +197,11 @@ public class MainWindow extends JFrame {
         this.mutationRateSpinner = new JSpinner();
         this.mutationRateSpinner.setModel(mutationRate);
 
-        SpinnerNumberModel tournamentSize = new SpinnerNumberModel(5, 2, 500, 1);
+        SpinnerNumberModel tournamentSize = new SpinnerNumberModel(2, 2, 500, 1);
         this.tournamentSizeSpinner = new JSpinner();
         this.tournamentSizeSpinner.setModel(tournamentSize);
 
-        SpinnerNumberModel generationSize = new SpinnerNumberModel(10, 10, 500, 1);
+        SpinnerNumberModel generationSize = new SpinnerNumberModel(5, 5, 500, 1);
         this.generationSizeSpinner = new JSpinner();
         this.generationSizeSpinner.setModel(generationSize);
 
