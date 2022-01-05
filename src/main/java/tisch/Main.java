@@ -6,7 +6,7 @@ public class Main {
 
     public static void main(String[] args) {
         // Create Gui
-        MainWindow mainWindow = new MainWindow("Genetically evolving the Perfect Table");
+        MainWindow mainWindow = new MainWindow("Genetically evolving the Perfect Table", true);
         mainWindow.setVisible(true);
 
 

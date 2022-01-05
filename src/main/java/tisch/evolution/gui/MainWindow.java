@@ -23,8 +23,14 @@ import tisch.evolution.population.Table;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainWindow extends JFrame {
     private JTextArea outputTextArea;
@@ -46,12 +52,13 @@ public class MainWindow extends JFrame {
     // These should probably not be here
     private List<Table> tables;
     private AbstractEvaluator evaluator;
+    private boolean experiment;
 
     /**
      * Constructor for main window. This is (bad) GUI-Stuff.
      * @param title
      */
-    public MainWindow(String title) {
+    public MainWindow(String title, boolean experiment) {
         super(title);
 
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -61,6 +68,7 @@ public class MainWindow extends JFrame {
         // This will run the optimizer
         runButton.addActionListener(getRunListener());
         visualizeButton.addActionListener(getVisualizeListener());
+        this.experiment = experiment;
     }
 
     /**
@@ -108,6 +116,8 @@ public class MainWindow extends JFrame {
             AbstractEvaluator evaluator = new WeightedWobblynessEvaluator();
             Optimizer optimizer = new Optimizer(evaluator, crossOverer, configuration);
 
+
+
             List<Table> result = optimizer.optimize();
             for (int i = 0; i < result.size(); i++) {
                 double currentFitness = evaluator.evaluateFitness(result.get(i));
@@ -115,6 +125,7 @@ public class MainWindow extends JFrame {
                         + result.get(i) + "\n   Fitness: " + currentFitness
                         + "\n--------------------------------------\n");
             }
+            
             Table lastTable = result.get(result.size() - 1);
             if (evaluator.evaluateFitness(lastTable) == fitnessGoal) {
                 this.appendOutputText("Success!\nPerfect resulting Table: \n   " + lastTable);
@@ -128,6 +139,10 @@ public class MainWindow extends JFrame {
             if (!visualizeButton.isEnabled()) {
                 visualizeButton.setEnabled(true);
             }
+            if (experiment) {
+                experiments(optimizer, evaluator);
+            }
+
         };
     }
 
@@ -244,5 +259,63 @@ public class MainWindow extends JFrame {
     public double getLengthDeviationSpinnerValue() throws ParseException {
         this.lengthDeviationSpinner.commitEdit();
         return (double) this.lengthDeviationSpinner.getValue();
+    }
+
+    private void experiments(Optimizer optimizer, AbstractEvaluator evaluator) {
+        List<Table> result = new ArrayList<Table>();
+        int totalGenerations = 0;
+        Map<Integer, Double> fitnessPerGeneration = new HashMap<>();
+        Map<Integer, Integer> runsPerGeneration = new HashMap<>();
+        int successfulRuns = 0;
+        final int RUNS = 50;
+
+        // Experiments
+        for (int i = 0; i < RUNS; i++) {
+            result = optimizer.optimize();
+            for (int j = 0; j < result.size(); j++) {
+                fitnessPerGeneration.merge(j + 1, evaluator.evaluateFitness(result.get(j)), Double::sum);
+                runsPerGeneration.merge(j + 1, 1, Integer::sum);
+            }
+            if (evaluator.evaluateFitness(result.get(result.size() - 1)) == 0.0) {
+                successfulRuns++;
+            }
+            totalGenerations += result.size();
+        }
+
+        String eol = System.getProperty("line.separator");
+
+        // Ugly logging for average fitness
+        try (Writer writer = new FileWriter("result.csv")) {
+            for (Map.Entry<Integer, Double> entry : fitnessPerGeneration.entrySet()) {
+                Double fitness = Math.round(entry.getValue() / runsPerGeneration.get(entry.getKey()) * 100.0) / 100.0;
+                String resultStr = String.valueOf(fitness);
+
+                writer.append(resultStr.substring(0, resultStr.indexOf('.')))
+                        .append(',')
+                        .append(resultStr.substring(resultStr.indexOf('.') + 1))
+                        .append(eol);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace(System.err);
+        }
+        // ugly logging for how many runs reach certain generation
+        try (Writer writer = new FileWriter("elementsPerGeneration.csv")) {
+            for (Map.Entry<Integer, Integer> entry : runsPerGeneration.entrySet()) {
+                writer.append(String.valueOf(entry.getValue()))
+                        .append(eol);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace(System.err);
+        }
+
+        System.out.println("Average fitness:");
+        int counter = 1;
+        for (double val : fitnessPerGeneration.values()) {
+            System.out.print(counter + ": ");
+            System.out.printf("%.2f\n", val / runsPerGeneration.get(counter));
+            counter++;
+        }
+        System.out.println("Average Generations: " + totalGenerations / RUNS);
+        System.out.println("Solution found in " + successfulRuns + " cases.");
     }
 }
